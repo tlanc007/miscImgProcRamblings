@@ -17,12 +17,13 @@ using Col_t = size_t;
 class Image
 {
 public:
-    explicit Image (Row_t numRows_, Col_t numCols_, size_t maxGrayLevel_);
+    explicit Image (Col_t numCols_, Row_t numRows_, size_t maxGrayLevel_);
     explicit Image (const std::string& fname);
 
-    int at (Row_t x_, Col_t y_) const;
+    int at (Col_t x_, Row_t y_) const;
     void setVal (Row_t x_, Col_t, unsigned val);
 
+    bool inBounds (Row_t row_, Col_t col_) const;
     void buildDummyImage ();
     void dumpImage () const;
 
@@ -30,8 +31,8 @@ private:
     void readImage (const std::string& fname);
     inline size_t yOffset (Col_t y_) const;
 
-    Row_t _pixCountX;
-    Col_t _pixCountY;
+    Col_t _pixCountX;
+    Row_t _pixCountY;
     size_t _maxGrayLevel;
     PixelContainer _pixels {};
 };

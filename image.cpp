@@ -4,9 +4,9 @@
 
 #include <fmt/printf.h>
 
-Image::Image (Row_t numRows_, Col_t numCols_, size_t maxGrayLevel_)
-: _pixCountX {numRows_},
-_pixCountY {numCols_},
+Image::Image (Col_t numCols_, Row_t numRows_, size_t maxGrayLevel_)
+: _pixCountX {numCols_},
+_pixCountY {numRows_},
 _maxGrayLevel {maxGrayLevel_},
 _pixels {PixelContainer (numRows_ * numCols_, 0) }
 { }
@@ -77,7 +77,8 @@ void Image::readImage(const std::string& fname_)
     ifp.close ();
 
 }
-size_t Image::yOffset (Col_t y_) const
+
+size_t Image::yOffset (Row_t y_) const
 {
     assert (y_ < _pixCountY && "range error");
     return _pixCountX * y_;
@@ -87,4 +88,9 @@ int Image::at (Row_t x_, Col_t y_) const
 {
     assert (x_ < _pixCountX && y_ < _pixCountY && "range error");
     return yOffset(y_) + x_;
+}
+
+bool Image::inBounds(Row_t row_, Col_t col_) const
+{
+    return row_ < _pixCountX && col_ < _pixCountY;
 }
