@@ -11,6 +11,7 @@ link_directories (/usr/local/lib)
 set(sources
     main.cpp
     image.cpp
+    image.hpp
 )
 
 add_executable(image ${sources})
