@@ -20,8 +20,10 @@ public:
     explicit Image (Col_t numCols_, Row_t numRows_, size_t maxGrayLevel_);
     explicit Image (const std::string& fname);
 
-    int at (Col_t x_, Row_t y_) const;
-    void setVal (Row_t x_, Col_t, unsigned val);
+    unsigned at (Col_t x_, Row_t y_) const;
+    void setVal (Col_t x_, Row_t y_, unsigned val);
+
+    void rotate (int degrees);
 
     bool inBounds (Row_t row_, Col_t col_) const;
     void buildDummyImage ();

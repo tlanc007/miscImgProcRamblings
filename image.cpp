@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 
 #include "image.hpp"
 
@@ -78,16 +79,55 @@ void Image::readImage(const std::string& fname_)
 
 }
 
+// rotation based on center of image
+void Image::rotate(int degrees_)
+{
+    constexpr auto PI {3.141593};
+    constexpr auto Rad {PI / 180.0};
+
+    Image tmp {_pixCountX, _pixCountY, _maxGrayLevel};
+    auto radians {degrees_* Rad};
+
+    // center of image
+    auto r0 {_pixCountY / 2};
+    auto c0 {_pixCountX / 2};
+
+    for (auto r {0u}; r < _pixCountY; ++r) {
+        for (auto c {0u}; c < _pixCountX; ++c) {
+            auto y0 {yOffset(r0) };
+            auto y {yOffset(r) };
+            auto r1 {y0 + ( (y - y0) * cos (radians) - ((c - c0) * sin (radians) ) ) };
+            auto c1 {c0 + ( (y - y0) * sin (radians) + ((c - c0) * cos (radians) ) ) };
+
+            if (inBounds(r1, c1) ) {
+                tmp.setVal(c1, r1, at(c, r) );
+            }
+            else {
+                fmt::print ("{},{} out of bounds\n", r1, c1);
+            }
+        }
+    }
+    //_pixels.swap (tmp._pixels);
+    std::swap (_pixels, tmp._pixels);
+
+}
+
 size_t Image::yOffset (Row_t y_) const
 {
     assert (y_ < _pixCountY && "range error");
     return _pixCountX * y_;
 }
 
-int Image::at (Row_t x_, Col_t y_) const
+unsigned Image::at (Col_t x_, Row_t y_) const
 {
     assert (x_ < _pixCountX && y_ < _pixCountY && "range error");
-    return yOffset(y_) + x_;
+    return _pixels[yOffset(y_) + x_];
+}
+
+void Image::setVal(Col_t x_, Row_t y_, unsigned int val)
+{
+    assert (x_ < _pixCountX && y_ < _pixCountY && "range error");
+    _pixels [yOffset(y_) + x_] = val;
 }
 
 bool Image::inBounds(Row_t row_, Col_t col_) const
