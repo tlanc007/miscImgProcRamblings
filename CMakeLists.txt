@@ -12,6 +12,8 @@ set(sources
     main.cpp
     image.cpp
     image.hpp
+    bmpFormat.cpp
+    bmpFormat.hpp
 )
 
 add_executable(image ${sources})
