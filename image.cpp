@@ -101,7 +101,6 @@ void Image::readImage(const std::string& fname_)
 }
 
 // rotation based on center of image
-// doesn't work on small sets due to precision errors
 void Image::rotate(int degrees_)
 {
     constexpr auto PI {3.141593};
@@ -113,8 +112,12 @@ void Image::rotate(int degrees_)
     const auto sr {sin (radians) };
 
     // center of image
-    double centerY {(_pixCountY-1) / 2.0};
-    double centerX {(_pixCountX-1) / 2.0};
+    const double centerY {(_pixCountY-1) / 2.0};
+    const double centerX {(_pixCountX-1) / 2.0};
+
+    auto roundCastLong = [] (auto newVal, auto center) {
+        return static_cast <long> (round (newVal + center) );
+    };
 
     for (auto y {0u}; y < _pixCountY; ++y) {
         for (auto x {0u}; x < _pixCountX; ++x) {
@@ -124,8 +127,9 @@ void Image::rotate(int degrees_)
             auto xnew {xPos * cr - yPos * sr };
             auto ynew {yPos * cr + xPos * sr };
 
-            auto x1 {xnew + centerX};
-            auto y1 {ynew + centerY};
+            auto x1 {roundCastLong (xnew, centerX) };
+            auto y1 {roundCastLong (ynew, centerY) };
+
             if (inBounds(y1, x1) ) {
                 tmp.setVal(x1, y1, at(x, y) );
             }
@@ -134,7 +138,6 @@ void Image::rotate(int degrees_)
             }
         }
     }
-    //_pixels.swap (tmp._pixels);
     std::swap (_pixels, tmp._pixels);
 
 }
@@ -142,21 +145,18 @@ void Image::rotate(int degrees_)
 size_t Image::yOffset (Row_t y_) const
 {
     assert (y_ < _pixCountY && "range error");
-    //fmt::print ("yOffset y: {} result {}\n", y_, _pixCountX * y_);
     return _pixCountX * y_;
 }
 
 unsigned Image::at (Col_t x_, Row_t y_) const
 {
     assert (x_ < _pixCountX && y_ < _pixCountY && "range error");
-    //fmt::print ("AT ({},{}) result: {}\n", x_, y_, _pixels[yOffset(y_) + x_]);
     return _pixels[yOffset(y_) + x_];
 }
 
 void Image::setVal(Col_t x_, Row_t y_, unsigned int val)
 {
     assert (x_ < _pixCountX && y_ < _pixCountY && "range error");
-    //fmt::print ("SET ({},{}) result: {}\n", x_, y_, _pixels[yOffset(y_) + x_]);
     _pixels [yOffset(y_) + x_] = val;
 }
 
