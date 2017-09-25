@@ -119,8 +119,10 @@ void Image::rotate(int degrees_)
         return static_cast <long> (round (newVal + center) );
     };
 
+    auto srcPixel {_pixels.data() };
+
     for (auto y {0u}; y < _pixCountY; ++y) {
-        for (auto x {0u}; x < _pixCountX; ++x) {
+        for (auto x {0u}; x < _pixCountX; ++x, ++srcPixel) {
             auto xPos {x - centerX};
             auto yPos {y - centerY};
 
@@ -131,7 +133,7 @@ void Image::rotate(int degrees_)
             auto y1 {roundCastLong (ynew, centerY) };
 
             if (inBounds(y1, x1) ) {
-                tmp.setVal(x1, y1, at(x, y) );
+                tmp.setVal(x1, y1, *srcPixel);
             }
             else {
                 fmt::print ("{},{} out of bounds\n", x1, y1);
