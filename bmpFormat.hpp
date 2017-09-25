@@ -8,7 +8,7 @@
 #include <vector>
 #include <stdio.h>
 
-using VecChar = std::vector <char>;
+using VecChar = std::vector <unsigned char>;
 
 long getImageInfo(FILE* inputFile, long offset, int numberOfChars);
 

@@ -16,7 +16,19 @@ Image::Image (const std::string& fname_)
 {
     // need better i/o
     readImage (fname_);
+}
 
+Image::Image (const BMPFormat& bmp)
+: _pixCountX {bmp.nCols},
+_pixCountY {bmp.nRows},
+_maxGrayLevel {127},
+_pixels {bmp.pixels}
+{ }
+
+void Image::copyToBmp(BMPFormat& bmp)
+{
+    // a bit overslimlified
+    bmp.pixels = _pixels;
 }
 
 void Image::buildDummyImage()
@@ -32,10 +44,19 @@ void Image::buildDummyImage()
 
 void Image::dumpImage() const
 {
+#if 0
     std::for_each (std::begin (_pixels), std::end (_pixels), [] (auto v) {
         fmt::print ("{} ", v);
     } );
-
+#else
+    auto val {_pixels.data () };
+    for (auto y {0u}; y < _pixCountY; ++y) {
+        for (auto x {0u}; x < _pixCountX; ++x) {
+            fmt::print ("{} ", *val++);
+        }
+        fmt::print ("\n");
+    }
+#endif
     fmt::print ("\n");
 
 }
@@ -80,30 +101,36 @@ void Image::readImage(const std::string& fname_)
 }
 
 // rotation based on center of image
+// doesn't work on small sets due to precision errors
 void Image::rotate(int degrees_)
 {
     constexpr auto PI {3.141593};
     constexpr auto Rad {PI / 180.0};
 
     Image tmp {_pixCountX, _pixCountY, _maxGrayLevel};
-    auto radians {degrees_* Rad};
+    const auto radians {degrees_* Rad};
+    const auto cr {cos (radians) };
+    const auto sr {sin (radians) };
 
     // center of image
-    auto r0 {_pixCountY / 2};
-    auto c0 {_pixCountX / 2};
+    double centerY {(_pixCountY-1) / 2.0};
+    double centerX {(_pixCountX-1) / 2.0};
 
-    for (auto r {0u}; r < _pixCountY; ++r) {
-        for (auto c {0u}; c < _pixCountX; ++c) {
-            auto y0 {yOffset(r0) };
-            auto y {yOffset(r) };
-            auto r1 {y0 + ( (y - y0) * cos (radians) - ((c - c0) * sin (radians) ) ) };
-            auto c1 {c0 + ( (y - y0) * sin (radians) + ((c - c0) * cos (radians) ) ) };
+    for (auto y {0u}; y < _pixCountY; ++y) {
+        for (auto x {0u}; x < _pixCountX; ++x) {
+            auto xPos {x - centerX};
+            auto yPos {y - centerY};
 
-            if (inBounds(r1, c1) ) {
-                tmp.setVal(c1, r1, at(c, r) );
+            auto xnew {xPos * cr - yPos * sr };
+            auto ynew {yPos * cr + xPos * sr };
+
+            auto x1 {xnew + centerX};
+            auto y1 {ynew + centerY};
+            if (inBounds(y1, x1) ) {
+                tmp.setVal(x1, y1, at(x, y) );
             }
             else {
-                fmt::print ("{},{} out of bounds\n", r1, c1);
+                fmt::print ("{},{} out of bounds\n", x1, y1);
             }
         }
     }
@@ -115,22 +142,25 @@ void Image::rotate(int degrees_)
 size_t Image::yOffset (Row_t y_) const
 {
     assert (y_ < _pixCountY && "range error");
+    //fmt::print ("yOffset y: {} result {}\n", y_, _pixCountX * y_);
     return _pixCountX * y_;
 }
 
 unsigned Image::at (Col_t x_, Row_t y_) const
 {
     assert (x_ < _pixCountX && y_ < _pixCountY && "range error");
+    //fmt::print ("AT ({},{}) result: {}\n", x_, y_, _pixels[yOffset(y_) + x_]);
     return _pixels[yOffset(y_) + x_];
 }
 
 void Image::setVal(Col_t x_, Row_t y_, unsigned int val)
 {
     assert (x_ < _pixCountX && y_ < _pixCountY && "range error");
+    //fmt::print ("SET ({},{}) result: {}\n", x_, y_, _pixels[yOffset(y_) + x_]);
     _pixels [yOffset(y_) + x_] = val;
 }
 
-bool Image::inBounds(Row_t row_, Col_t col_) const
+bool Image::inBounds(Col_t col_, Row_t row_) const
 {
-    return row_ < _pixCountX && col_ < _pixCountY;
+    return col_ < _pixCountY && row_ < _pixCountX;
 }
