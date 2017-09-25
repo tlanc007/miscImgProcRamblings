@@ -4,7 +4,9 @@ project(simpleImageProcessing)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories (/usr/local/include)
+set(STOPWATCH_DIR /Volumes/users/tal/Documents/GoogleDrive/Docs/Programming)
+
+include_directories (/usr/local/include ${STOPWATCH_DIR} )
 
 link_directories (/usr/local/lib)
 
