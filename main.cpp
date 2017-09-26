@@ -11,13 +11,14 @@
 void run_timer(const BMPFormat& bmp)
 {
     //    constexpr auto Loops {100000};
-    constexpr auto Loops {1000};
+    constexpr auto Loops {10000};
 
     {
+        Image image {bmp};
+
         fmt::print ("Timing against {} loops.\n", Loops);
         StopWatch<> sw ("orig");
         for (auto i {0u}; i < Loops; ++i) {
-            Image image {bmp};
             image.rotate(180);
         }
     }
