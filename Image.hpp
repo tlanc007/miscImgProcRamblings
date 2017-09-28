@@ -31,6 +31,9 @@ public:
     void pixels (PixelContainer pixels_);
     PixelContainer pixelContainer () const;
 
+    size_t rows () const { return _pixelsY; }
+    size_t cols () const { return _pixelsX; }
+
     void dump () const;
     void buildDummyImage8BitGray ();
     

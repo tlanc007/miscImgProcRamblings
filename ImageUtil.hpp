@@ -6,6 +6,7 @@
 #include "Image.hpp"
 
 Image copyFromOpenCV (const cv::Mat& cvImage);
+cv::Mat copyToOpenCV (const Image& image);
 
 
 #endif // IMAGE_UTIL_HPP

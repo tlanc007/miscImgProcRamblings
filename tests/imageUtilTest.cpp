@@ -16,3 +16,21 @@ TEST (ImageUtilTest, create2x2ImageFromOpenCVMat)
     Image img {copyFromOpenCV(cvImage) };
     ASSERT_EQ (expected, img.pixelContainer () );
 }
+
+TEST (ImageUtilTest, create2x2CVMatFromImage)
+{
+    constexpr auto Rows {2u};
+    constexpr auto Cols {2u};
+    constexpr auto bits {8u};
+    constexpr auto channel {1u};
+    Image img (Cols, Rows, bits, channel);
+    const PixelContainer imgData {4, 3, 2, 1};
+    img.pixels(imgData);
+
+    cv::Mat cvImage {copyToOpenCV (img) };
+    Image backFrom {copyFromOpenCV(cvImage) };
+
+    ASSERT_EQ (Rows, backFrom.rows() ); // just to make sure
+    ASSERT_EQ (Cols, backFrom.cols() ); // just to make sure
+    ASSERT_EQ (imgData, backFrom.pixelContainer() );
+}
