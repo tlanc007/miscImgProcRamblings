@@ -20,3 +20,32 @@ TEST (ImageUtilTest, readbmpFile)
     ASSERT_EQ(img.cols(), ImCols);
 }
 
+TEST (ImageUtilTest, writebmpFile)
+{
+    constexpr auto Rows {128};
+    constexpr auto Cols {128};
+    constexpr auto Bits {8};
+    constexpr auto Channel {1u};
+    constexpr unsigned char PixVal {255};
+    constexpr auto WritePath {"/tmp/imageUtilFileTest.ppm"};
+
+    const PixelContainer pcData (Rows*Cols, PixVal);
+    Image img {Cols, Rows, Bits, Channel};
+    img.pixels(pcData);
+
+    cv::imwrite (WritePath, copyToOpenCV(img));
+
+    // verify written image by reading back in
+    cv::Mat fromDisk {cv::imread (WritePath) };
+
+    ASSERT_EQ (Cols, fromDisk.cols);
+    ASSERT_EQ (Rows, fromDisk.rows);
+
+    auto matDiskData {fromDisk.data };
+    auto expectedData {std::begin (pcData) };
+    // only checking first row
+    for (auto i {0u}; i < Cols; ++i) {
+        ASSERT_EQ(*matDiskData++, *expectedData++);
+    }
+}
+
