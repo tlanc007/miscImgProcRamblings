@@ -20,3 +20,4 @@ set(sources
 #target_link_libraries(image fmt)
 
 add_subdirectory (tests)
+add_subdirectory (fileTests)
