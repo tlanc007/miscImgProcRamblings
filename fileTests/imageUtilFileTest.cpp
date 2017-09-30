@@ -53,7 +53,6 @@ TEST (ImageUtilFileTest, writebmpFile)
 class ImageFileUtilRead: public Test
 {
 public:
-
     cv::Mat cvImage {};
     Image img { };
 
@@ -62,47 +61,60 @@ public:
     }
 
 private:
-    void buildCVImage () {
-        constexpr auto Rows {32};
-        constexpr auto Cols {32};
-        int sizes[] {Cols, Rows};
-        cv::Mat rgb {2, sizes, CV_8UC3};
-        //fmt::print (" ({}, {}): mat dims {} chans {} depth {} total {}\n", rgb.rows, rgb.cols, rgb.dims, rgb.channels(), rgb.depth(), rgb.total() );
+    void buildCVImage ();
 
-        ASSERT_EQ(Rows, rgb.rows);
-        ASSERT_EQ(Cols, rgb.cols);
-
-        using cvPixel = cv::Point3_<uint8_t>;
-        for (auto y {0u}; y < Rows; ++y) {
-            uint8_t r {100};
-            uint8_t g {50};
-            uint8_t b {200};
-            //cvPixel* colPtr {rgb.ptr <cvPixel> (0, y) }; // docs wrong
-            cvPixel* colPtr {rgb.ptr <cvPixel> (y, 0) };
-            const auto colPtrEnd {colPtr + Cols};
-            auto x {0u};
-            for (; colPtr != colPtrEnd; ++colPtr, ++r, ++g, ++b, ++x) {
-                colPtr->x = r;
-                colPtr->y = g;
-                colPtr->z = b;
-                if (colPtr == colPtrEnd-1)
-                    ; //fmt::print ("({}, {}): {}, {}, {}\n", x, y, colPtr->x, colPtr->y, colPtr->z );
-
-            }
-        }
-        cv::imwrite("rgb.tif", rgb);
-
-        // cheating rather than reading the image just reusing rgb
-        cvImage = rgb;
-        img = copyFromOpenCV(cvImage);
-    }
-
+#if 0
+    // compiler has linking issues
+    static constexpr auto ImRows {32};
+    static constexpr auto ImCols {32};
+#else
+    static const int ImRows;
+    static const int ImCols;
+#endif
 };
+
+const int ImageFileUtilRead::ImRows {32};
+const int ImageFileUtilRead::ImCols {32};
+
+void ImageFileUtilRead::buildCVImage () {
+    int sizes[] {ImCols, ImRows};
+    cv::Mat rgb {2, sizes, CV_8UC3};
+    //fmt::print (" ({}, {}): mat dims {} chans {} depth {} total {}\n", rgb.rows, rgb.cols, rgb.dims, rgb.channels(), rgb.depth(), rgb.total() );
+
+    ASSERT_EQ(ImRows, rgb.rows);
+    ASSERT_EQ(ImCols, rgb.cols);
+
+    using cvPixel = cv::Point3_<uint8_t>;
+    for (auto y {0u}; y < ImRows; ++y) {
+        uint8_t r {100};
+        uint8_t g {50};
+        uint8_t b {200};
+        //cvPixel* colPtr {rgb.ptr <cvPixel> (0, y) }; // docs wrong
+        cvPixel* colPtr {rgb.ptr <cvPixel> (y, 0) };
+        const auto colPtrEnd {colPtr + ImCols};
+        auto x {0u};
+        for (; colPtr != colPtrEnd; ++colPtr, ++r, ++g, ++b, ++x) {
+            colPtr->x = r;
+            colPtr->y = g;
+            colPtr->z = b;
+            if (colPtr == colPtrEnd-1)
+                ; //fmt::print ("({}, {}): {}, {}, {}\n", x, y, colPtr->x, colPtr->y, colPtr->z );
+
+        }
+    }
+    cv::imwrite("rgb.tif", rgb);
+
+    // cheating rather than reading the image just reusing rgb
+    cvImage = rgb;
+    img = copyFromOpenCV(cvImage);
+}
 
 TEST_F(ImageFileUtilRead, read8bitRGBImg)
 {
 
     ASSERT_EQ(cvImage.channels(), img.channels () );
+
+
 
 }
 
