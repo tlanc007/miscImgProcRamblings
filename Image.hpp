@@ -20,6 +20,7 @@ using PixelContainer = std::vector <unsigned char>;
 class Image
 {
 public:
+    Image () = default;
     Image (Cols pixelsX_, Rows pixelsY_, BitsPP bitsPP_, Channels channels_)
     : _pixelsX {pixelsX_},
     _pixelsY {pixelsY_},
