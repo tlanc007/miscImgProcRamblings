@@ -7,7 +7,7 @@
 
 using namespace ::testing;
 
-TEST (ImageUtilTest, readbmpFile)
+TEST (ImageUtilFileTest, readbmpFile)
 {
     constexpr auto ImRows {512};
     constexpr auto ImCols {512};
@@ -15,12 +15,13 @@ TEST (ImageUtilTest, readbmpFile)
 
     cv::Mat cvImage {cv::imread(bmp) };
 
+    // Todo: Not exactly checking image data
     Image img {copyFromOpenCV(cvImage) };
     ASSERT_EQ(img.rows(), ImRows);
     ASSERT_EQ(img.cols(), ImCols);
 }
 
-TEST (ImageUtilTest, writebmpFile)
+TEST (ImageUtilFileTest, writebmpFile)
 {
     constexpr auto Rows {128};
     constexpr auto Cols {128};
@@ -49,3 +50,57 @@ TEST (ImageUtilTest, writebmpFile)
     }
 }
 
+class ImageFileUtilRead: public Test
+{
+public:
+
+    cv::Mat cvImage {};
+
+    void SetUp() {
+        buildCVImage();
+    }
+
+private:
+    void buildCVImage () {
+        constexpr auto Rows {32};
+        constexpr auto Cols {32};
+        int sizes[] {Cols, Rows};
+        cv::Mat rgb {2, sizes, CV_8UC3};
+        //fmt::print (" ({}, {}): mat dims {} chans {} depth {} total {}\n", rgb.rows, rgb.cols, rgb.dims, rgb.channels(), rgb.depth(), rgb.total() );
+
+        ASSERT_EQ(Rows, rgb.rows);
+        ASSERT_EQ(Cols, rgb.cols);
+
+        using cvPixel = cv::Point3_<uint8_t>;
+        for (auto y {0u}; y < Rows; ++y) {
+            uint8_t r {100};
+            uint8_t g {50};
+            uint8_t b {200};
+            //cvPixel* colPtr {rgb.ptr <cvPixel> (0, y) }; // docs wrong
+            cvPixel* colPtr {rgb.ptr <cvPixel> (y, 0) };
+            const auto colPtrEnd {colPtr + Cols};
+            auto x {0u};
+            for (; colPtr != colPtrEnd; ++colPtr, ++r, ++g, ++b, ++x) {
+                colPtr->x = r;
+                colPtr->y = g;
+                colPtr->z = b;
+                if (colPtr == colPtrEnd-1)
+                    ; //fmt::print ("({}, {}): {}, {}, {}\n", x, y, colPtr->x, colPtr->y, colPtr->z );
+
+            }
+        }
+        cv::imwrite("rgb.tif", rgb);
+
+        // cheating rather than reading the image just reusing rgb
+        cvImage = rgb;
+    }
+
+};
+
+TEST_F(ImageFileUtilRead, read8bitRGBImg)
+{
+    Image img {copyFromOpenCV(cvImage) };
+
+    ASSERT_EQ(cvImage.channels(), img.channels () );
+
+}

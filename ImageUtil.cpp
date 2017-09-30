@@ -7,8 +7,7 @@
 Image copyFromOpenCV (const cv::Mat& cvImage)
 {
     constexpr auto bits {8u};
-    constexpr auto channel {1u};
-    Image img {cvImage.cols, cvImage.rows, bits, channel};
+    Image img {cvImage.cols, cvImage.rows, bits, static_cast<Channels> (cvImage.channels() ) };
 
     PixelContainer pixels {};
     const auto containerSize {cvImage.cols * cvImage.rows};

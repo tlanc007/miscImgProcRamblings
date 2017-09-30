@@ -33,6 +33,7 @@ public:
 
     size_t rows () const { return _pixelsY; }
     size_t cols () const { return _pixelsX; }
+    size_t channels () const {return _channels; }
 
     void dump () const;
     void buildDummyImage8BitGray ();
