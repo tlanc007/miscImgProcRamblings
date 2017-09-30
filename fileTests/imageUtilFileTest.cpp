@@ -55,6 +55,7 @@ class ImageFileUtilRead: public Test
 public:
 
     cv::Mat cvImage {};
+    Image img { };
 
     void SetUp() {
         buildCVImage();
@@ -93,14 +94,18 @@ private:
 
         // cheating rather than reading the image just reusing rgb
         cvImage = rgb;
+        img = copyFromOpenCV(cvImage);
     }
 
 };
 
 TEST_F(ImageFileUtilRead, read8bitRGBImg)
 {
-    Image img {copyFromOpenCV(cvImage) };
 
     ASSERT_EQ(cvImage.channels(), img.channels () );
 
 }
+
+
+
+// add tests for alternate pixel sizes (types)
