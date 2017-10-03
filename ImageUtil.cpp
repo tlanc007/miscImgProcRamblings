@@ -10,7 +10,7 @@ Image copyFromOpenCV (const cv::Mat& cvImage)
     Image img {cvImage.cols, cvImage.rows, bits, static_cast<Channels> (cvImage.channels() ) };
 
     PixelContainer pixels {};
-    const auto containerSize {cvImage.cols * cvImage.rows};
+    const auto containerSize {img.pixelContainer().size()};
     pixels.reserve(containerSize);
     auto cvData {cvImage.data};
     for (auto i {0u}; i < containerSize; ++i) {
@@ -24,22 +24,9 @@ Image copyFromOpenCV (const cv::Mat& cvImage)
 
 cv::Mat copyToOpenCV (const Image& im)
 {
-
-#if 0
-    // for some reason creates a 3,1 rather than 2,2
-    cv::Mat m {
-        static_cast<int> (im.rows () ),
-        static_cast<int> (im.cols() ), CV_8UC1 // Todo: hardwired
-    };
-
-    fmt::print ("im rows {} sc_int {}\n", im.rows(), static_cast<int>(im.rows() ) );
-    fmt::print ("im cols {} sc_int {}\n", im.cols(), static_cast<int>(im.cols() ) );
-    fmt::print ("M rows {} cols {}\n", m.rows, m.cols);
-#else
     cv::Mat m = cv::Mat_<unsigned char> (
                                          static_cast<int> (im.rows () ),
                                          static_cast<int> (im.cols() ) );
-#endif
 
     auto cvData {m.data};
     auto pixels {im.pixelContainer() };
@@ -50,4 +37,12 @@ cv::Mat copyToOpenCV (const Image& im)
 
 
     return m;
+}
+
+bool compareImageWithCVImage (IMPixel& imPixel, const CVPixel& cvPixel )
+{
+    /* fmt::print ("imPixel ({}, {}, {}) ", *imPixel, *(imPixel+1), *(imPixel+2) );
+    fmt::print ("cvPixel(xyz) ({}, {}, {})\n",
+                cvPixel.x, cvPixel.y, cvPixel.z); */
+    return *imPixel == cvPixel.x;
 }

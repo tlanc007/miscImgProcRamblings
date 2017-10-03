@@ -34,3 +34,55 @@ TEST (ImageUtilTest, create2x2CVMatFromImage)
     ASSERT_EQ (Cols, backFrom.cols() ); // just to make sure
     ASSERT_EQ (imgData, backFrom.pixelContainer() );
 }
+
+using CVPixel = cv::Point3_<uint8_t>;
+
+class ImageUtilChannelsTest: public Test
+{
+public:
+    cv::Mat cvImage {};
+    Image img {};
+
+    void SetUp () {
+        buildCVImage();
+    }
+
+private:
+    void buildCVImage ();
+
+
+
+};
+
+void ImageUtilChannelsTest::buildCVImage()
+{
+    constexpr auto Red {50};
+    constexpr auto Green {100};
+    constexpr auto Blue {200};
+    int sizes[] {2, 2};
+    cv::Mat rgb {2, sizes, CV_8UC3};
+
+    for (auto &p: cv::Mat_<CVPixel> (rgb) ) {
+        p.x = Red;
+        p.y = Green;
+        p.z = Blue;
+    }
+
+    cvImage = rgb;
+    img = copyFromOpenCV(cvImage);
+}
+
+TEST_F (ImageUtilChannelsTest, checkRGB)
+{
+    // Todo: need an Image pointer call
+    PixelContainer imgPixels {img.pixelContainer() };
+    auto imgPixData {imgPixels.data () };
+    for (auto r {0u}; r < cvImage.rows; ++r) {
+        auto cvPtr {cvImage.ptr <CVPixel> (r, 0) };
+        const auto cvPtrEnd {cvPtr + cvImage.cols};
+        for (; cvPtr != cvPtrEnd; ++cvPtr) {
+            ASSERT_TRUE (compareImageWithCVImage (imgPixData, *cvPtr ) );
+            imgPixData += 3;
+        }
+    }
+}

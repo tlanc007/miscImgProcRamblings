@@ -15,7 +15,8 @@ using Channels = size_t;
 /* of limited use as only accounts for greyscale 8bit image
    perhaps a template of the proper bitdepth and channels or a template class
  */
-using PixelContainer = std::vector <unsigned char>;
+using ImageDataType = unsigned char; // Todo: hack for now
+using PixelContainer = std::vector <ImageDataType>;
 
 class Image
 {
@@ -26,7 +27,7 @@ public:
     _pixelsY {pixelsY_},
     _bitsPerPixel {bitsPP_},
     _channels {channels_},
-    _pixels (pixelsX_ * pixelsY_, 0) // Todo: this needs to account for bits
+    _pixels (pixelsX_ * pixelsY_ * channels_, 0) // Todo: this needs to account for bits
     { }
     
     void pixels (PixelContainer pixels_);
@@ -36,6 +37,7 @@ public:
     size_t cols () const { return _pixelsX; }
     size_t channels () const {return _channels; }
 
+    
     void dump () const;
     void buildDummyImage8BitGray ();
     

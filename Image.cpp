@@ -6,7 +6,7 @@
 void Image::pixels (PixelContainer pixels_)
 {
     // todo: need to account for bitspp and channels
-    assert (pixels_.size() == _pixelsX * _pixelsY && "image data doesn't match size");
+    assert (pixels_.size() == _pixels.size () && "image data doesn't match size");
     _pixels = pixels_;
 }
 
