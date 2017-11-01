@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.9)
+
+project(imageProcessing)
+
+#set(CMAKE_CXX_STANDARD 14) # xcode does -std=gnu-14
+#add_definitions(-std=c++14)
+add_definitions(-std=c++1z)
+
+set(STOPWATCH_DIR /Volumes/users/tal/Documents/GoogleDrive/Docs/Programming)
+
+include_directories (/usr/local/include ${STOPWATCH_DIR} )
+
+link_directories (/usr/local/lib)
+
+set(sources
+    #main.cpp
+    image.cpp
+    image.hpp
+)
+
+#add_executable(image ${sources})
+#target_link_libraries(image fmt)
+
+add_subdirectory (tests)
+add_subdirectory (fileTests)
